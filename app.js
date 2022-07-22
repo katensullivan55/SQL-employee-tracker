@@ -84,7 +84,64 @@ class Tracker {
                 console.log('Department has been added');
                 return this.mainMenu();
             }); 
-    }
+    };
+    viewAllRoles(){
+        const sql = `SELECT role.id, role.title, role.salary, department.name AS department_name FROM role LEFT JOIN department ON role.department_id = department.id`;
+
+        db.query(sql, (err, result) => {
+            if(err) {
+                console.log(err);
+                return;
+            }
+            console.table(result);
+            return this.mainMenu();
+        });
+    };
+    addNewRolePrompt(){
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'title',
+                        message: 'What is the title of the role?',
+                        validate: input => {
+                            if(input) {
+                                return true;
+                            } else {
+                                console.log('Please enter the role title.');
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        type: 'input',
+                        name: 'salary',
+                        message: 'What is the salary for this role?',
+                        validate: input => {
+                            if(input) {
+                                return true;
+                            } else {
+                                console.log('Please enter the salary.');
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        type: 'input',
+                        name: 'department',
+                        message: 'What is the id of the department you would like to add?',
+                    }
+                ]).then((res) => {
+                    console.log("Adding a new role")
+                   
+                    db.query( 'INSERT INTO role SET ?',
+                    {
+                        title: res.title,
+                        salary: res.salary,
+                        department_id: res.department
+                    });
+                    return this.mainMenu();
+                });
+    };
 
 }
 
